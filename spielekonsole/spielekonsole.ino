@@ -1,7 +1,7 @@
 #include "MyOneButtonTiny.h"
 #include <tinyNeoPixel.h>
 #include "Player.h"
-
+#include "Mastermind.h"
 
 #define randomizerPin 0
 
@@ -37,15 +37,13 @@ MyOneButtonTiny key1(key1_PIN, true);
 MyOneButtonTiny key2(key2_PIN, true);
 MyOneButtonTiny key3(key3_PIN, true);
 
-int a = 0;
-
 void setup() {
   randomSeed(analogRead(randomizerPin));
   
   strip.begin();
   strip.show(); 
   
-  // setAllLEDs(255, 0, 255); // Set all LEDs to purple for menu
+  strip.setBrightness(50);
 
   key1.attachClick(singleClickkey1);
   key1.attachLongPressStart(longPresskey1);
@@ -115,7 +113,7 @@ uint8_t getRandomFruitLocation() {
 }
 
 void pongOutOfBounds(){
-  if(player.getPosition() < 0){
+  if(player.getDirection() == -1){
     for(int i=0;i<strip.numPixels();i++){
       strip.setPixelColor(i, strip.Color(0,150,0)); 
       strip.show();
@@ -123,7 +121,7 @@ void pongOutOfBounds(){
     }
     prevstate = loss;
   }
-  if(player.getPosition() >= strip.numPixels()){
+  if(player.getDirection() == 1){
     for(int i=strip.numPixels();i>=0;i--){
       strip.setPixelColor(i, strip.Color(0,150,0)); 
       strip.show();
@@ -140,6 +138,7 @@ void configurePong(){
 
   player.setUpdateInterval(200);
   player.setSize(1);
+  player.setColor(20, 230, 20);
   player.setPosition((int)(strip.numPixels()-2)/2);
   setAllLEDs(0, 0, 0);
 }
@@ -215,6 +214,7 @@ void handleGameState() {
         player.setSize(1);
         player.setPosition(0);
         player.unregisterOutOfBoundsHandler();
+        player.setColor(20, 230, 20);
         
         prevstate=Menu;
         player.setPosition(1);
@@ -225,8 +225,13 @@ void handleGameState() {
       if(prevstate!=game1){
         prevstate=game1;
         player.unregisterOutOfBoundsHandler();
+        mastermind_init();
       }
-      setAllLEDs(0, 0, 0);
+      mastermind_loop();
+      if (mastermind_win){
+        gamestate = win;
+        mastermind_win = false;
+      }
       break;
     case game2:
       if(prevstate!=game2){
@@ -244,6 +249,7 @@ void handleGameState() {
         player.setUpdateInterval(500);
         player.setSize(1);
         player.setPosition(5);
+        player.setColor(20, 230, 20);
         setAllLEDs(0, 0, 0);
         awaitButtonPress();
       }
@@ -261,6 +267,7 @@ void handleGameState() {
         player.setMoveDirection(getRandomDirection());
         player.setUpdateInterval(500);
         player.setSize(1);
+        player.setColor(20, 230, 20);
         player.setPosition((int)(strip.numPixels()-2)/2);
         buttonPressed = false;
         setAllLEDs(0, 0, 0);
@@ -335,9 +342,9 @@ void handleGameState() {
       if(prevstate!=lednumber){
         prevstate=lednumber;
         player.setMoveDirection(0);
-        player.setSize(strip.numPixels());
+        player.setSize(1);
       }
-      setAllLEDs(0,0,0);
+      setAllLEDs(20, 230, 20);
       break;
     default:
       break;
@@ -378,6 +385,7 @@ void singleClickkey1() {
       gamestate  = static_cast<gamestate_t>(player.getPosition()+1);
       break;
     case game1:
+      mastermind_button1();
       break;
     case game2:
       break;
@@ -424,6 +432,7 @@ void singleClickkey2() {
       player.moveleft();
       break;
     case game1:
+      mastermind_button2();
       break;
     case game2:
       break;
@@ -439,7 +448,6 @@ void singleClickkey2() {
       break;
     case lednumber:
       if(player.getSize()>1){
-        player.decSize();
         strip.updateLength(strip.numPixels()-1);
       }
       break;
@@ -461,6 +469,7 @@ void singleClickkey3() {
       player.moveright();
       break;
     case game1:
+      mastermind_button3();
       break;
     case game2:
       break;
@@ -478,7 +487,6 @@ void singleClickkey3() {
     case lednumber:
       if(player.getSize()>=strip.numPixels()){
         strip.updateLength(strip.numPixels()+1);
-        player.incSize();
       }
       break;
     default:

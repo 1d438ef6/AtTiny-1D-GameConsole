@@ -5,9 +5,11 @@
 
 class Player {
 public:
-  Player(uint8_t startX, uint8_t startsize, int8_t startdirction, uint8_t r, uint8_t g, uint8_t b);
+  Player(uint8_t startX, uint8_t startsize, int8_t startdirection, uint8_t r, uint8_t g, uint8_t b);
+  Player(uint8_t startX, uint8_t startsize, int8_t startdirection, uint32_t color);
 
   void setColor(uint8_t r, uint8_t g, uint8_t b);
+  void setColor(uint32_t newColor);
   void setSize(uint8_t newSize);
   uint8_t getSize();
   void incSize();
@@ -36,7 +38,7 @@ public:
 private:
   uint8_t x;             // Position of the player
   uint8_t playersize;            // Size of the player (number of LEDs)
-  uint8_t colorR, colorG, colorB; // Color of the player
+  uint32_t color;
   int8_t move_direction;
 
   bool disableMovementCheck;

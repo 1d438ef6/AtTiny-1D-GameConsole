@@ -4,14 +4,23 @@
 extern tinyNeoPixel strip;
 
 Player::Player(uint8_t startX, uint8_t startsize, int8_t startdirection,uint8_t r, uint8_t g, uint8_t b)
-  : x(startX), playersize(startsize), move_direction(startdirection), colorR(r), colorG(g), colorB(b) {
+  : x(startX), playersize(startsize), move_direction(startdirection) {
     this->unregisterOutOfBoundsHandler();
+    this->color = strip.Color(r, g, b);
   }
 
+Player::Player(uint8_t startX, uint8_t startsize, int8_t startdirection, uint32_t color)
+  : x(startX), playersize(startsize), move_direction(startdirection), color(color){
+  this->unregisterOutOfBoundsHandler();
+}
+
 void Player::setColor(uint8_t r, uint8_t g, uint8_t b) {
-  this->colorR = r;
-  this->colorG = g;
-  this->colorB = b;
+  this->color = strip.Color(r, g, b);
+  updateLEDs();
+}
+
+void Player::setColor(uint32_t newColor){
+  this->color = newColor;
   updateLEDs();
 }
 
@@ -80,14 +89,14 @@ void Player::setAfterglow(bool afterglow){
 void Player::updateLEDs() {
   if ((this->move_direction == 0) || (this->move_direction == -1)){
     for (int i = 0; i < this->playersize; i++){
-      strip.setPixelColor(x+i, strip.Color(this->colorR, this->colorG, this->colorB));
+      strip.setPixelColor(x+i, this->color);
     }
   } else {
     for (int i = this->playersize-1; i > 0; i--){
-      strip.setPixelColor(x-i, strip.Color(this->colorR, this->colorG, this->colorB));
+      strip.setPixelColor(x-i, this->color);
     }
   }
-  strip.setPixelColor(this->x, strip.Color(this->colorR, this->colorG, this->colorB));
+  strip.setPixelColor(this->x, this->color);
 }
 
 uint8_t Player::getPosition(){
