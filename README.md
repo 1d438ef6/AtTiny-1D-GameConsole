@@ -1,5 +1,7 @@
 # AtTiny-1D-GameConsole
 
+I was to lazy to include images into this text here, if you want to see the project please got to its hackaday page: https://hackaday.io/project/197743-attiny85-1d-game-console
+
 ## The Idea, designing and the PCBWay sponsorship
 
 My goal for this project was straightforward: to create a compact and functional gaming console using an ATtiny85 and WS2812 LEDs. The challenge was to maximize functionality within the constraints of the ATtiny85's limited pins, RAM, and Flash memory. To conserve memory, I opted for hardware-based debouncing using capacitors, eliminating the need for software debouncing routines, which would have consumed valuable memory.
